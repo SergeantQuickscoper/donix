@@ -18,6 +18,6 @@ This project will start out as an AI agent CLI tool for linux. I will attempt to
 
 
  #### Testing Models for my personal use:
- 1.  unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF 
- 
+ 1.  unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF ([Q4 K_M](https://huggingface.co/unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF/resolve/main/DeepSeek-R1-0528-Qwen3-8B-Q4_K_M.gguf) and [Q4_UD_K_XL](https://huggingface.co/unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF/resolve/main/DeepSeek-R1-0528-Qwen3-8B-UD-Q4_K_XL.gguf) versions)
+ 2.  unsloth/DeepSeek-R1-Distill-Qwen-7B-GGUF ([Q4_K_M](https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-7B-GGUF/resolve/main/DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf))
 I have no idea what im doing rn but ill figure this out.
