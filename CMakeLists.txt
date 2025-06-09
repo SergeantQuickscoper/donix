@@ -3,8 +3,12 @@ project(donix)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include_directories(include)
+
 # Add llama.cpp
 add_subdirectory(external/llama.cpp)
+
+add_executable(donix src/main.cpp src/mcpServer.cpp)
 
 # llama.cpp link
 target_link_libraries(donix PRIVATE llama)
