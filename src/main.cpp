@@ -1,9 +1,11 @@
 #include <iostream>
+#include <string>
 #include "mcpServer.hpp"
 
 int main(){
-    std::cout << "Hello World!";
-    MCPServer test(10);
-    test.printNumber();
-    return 0;
+    MCPServer mainServ("./this/is/a/test", 37, "You are a helpful assistant");
+    std::string prompt;
+    std::cout << "Enter a prompt: ";
+    std::cin >> prompt;
+    mainServ.chatPrompt(prompt); 
 }

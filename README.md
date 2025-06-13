@@ -24,5 +24,10 @@ This project will start out as an AI agent CLI tool for linux. I will attempt to
 
 ### Phase 1
 Building an MCP server that recieves a prompt through the CLI and returns the LLM response.
+Basically use this for now:
+##### This will be the simple chat command of the mcp server
+`./llama.cpp/build/bin/llama-cli -m models/DeepSeek-R0-0528-Qwen3-8B-UD-Q4_K_XL.gguf --jinja --single-turn --prompt "tell me about mao zedong in one sentence" --gpu-layers 37 -sys "You are a helpful assistant."`
 
-I have no idea what im doing rn but ill figure this out.
+So if im not wrong as long as i have the llama.cpp binaries in my build, and the model file, everything should work out great. The copying is kind of scuffed but it should work for now, luckily have good disk space haha. 
+
+Ok we are basically a llama.cpp wrapper for now but this seems promisingly useful.
