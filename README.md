@@ -31,3 +31,14 @@ Basically use this for now:
 So if im not wrong as long as i have the llama.cpp binaries in my build, and the model file, everything should work out great. The copying is kind of scuffed but it should work for now, luckily have good disk space haha. 
 
 Ok we are basically a llama.cpp wrapper for now but this seems promisingly useful.
+
+### TODOs
+
+- Prompt Engineering :nerd: (have it stop hallucinating, replying to itself, temperature controls etc.)
+- Result Styling (make it look cooler and not just the raw output)
+- Support for other endpoints (also standardize the chat endpoint)
+- Run LLM or llama-cli as a daemon or in the background for quick inference
+- Stream responses 
+- have the app be a cli tool with arguments instead of using iostream funcs
+
+

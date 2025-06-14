@@ -9,7 +9,7 @@ rm -rf build
 
 echo "Copying external dependencies...."
 
-mkdir build && mkdir build/external && mkdir build/external/llama.cpp && mkdir build/external/models
+mkdir build && mkdir build/external && mkdir build/external/llama.cpp
 
 # This assumes you've built llama.cpp and have your models saved in the respective external directories
 cp -r external/llama.cpp/build/bin/ build/external/llama.cpp 
