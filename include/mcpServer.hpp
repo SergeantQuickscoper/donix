@@ -6,7 +6,6 @@
 class MCPServer {
     public:
         MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt);
-        void chatPrompt(std::string prompt);
     private:
         std::string modelPath;
         std::string sysPrompt;

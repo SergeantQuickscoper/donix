@@ -7,7 +7,7 @@ find_package(Boost 1.70 REQUIRED COMPONENTS system process)
 
 include_directories(include)
 
-add_executable(donix src/main.cpp src/mcpServer.cpp)
+add_executable(donix src/main.cpp src/mcpServer.cpp src/mcpClient.cpp)
 
 target_include_directories(donix PRIVATE ${Boost_INCLUDE_DIRS})
 
