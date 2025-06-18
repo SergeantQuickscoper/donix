@@ -2,12 +2,15 @@
 #include <fstream>
 #include <filesystem>
 #include <pty.h>
-#include "mcpServer.hpp"
+#include <mcpServer.hpp>
+#include <sys/socket.h>
 #include <string>
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
 #include <boost/system.hpp>
 #include <boost/process/v2/posix/fork_and_forget_launcher.hpp>
+
+#define bufferSize 128
 
 void MCPServer::onExit(){
     std::ofstream log("/tmp/donix/mcpserver.log", std::ios::app);
@@ -35,10 +38,11 @@ MCPServer::MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt
 
     pid_t pid = fork();
     if (pid < 0) std::exit(1);
-    if (pid > 0) return;         // Parent exits, returns child PID
+    if (pid > 0) return;         // Parent exits
 
     if (setsid() < 0) std::exit(1);  // Become session leader (create a new session for the child)
 
+    // This is a second fork after the first 
     pid = fork();
     if (pid < 0) std::exit(1);
     if (pid > 0) std::exit(0);       // First child exits
@@ -61,17 +65,18 @@ MCPServer::MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt
     std::filesystem::path pidPath = "/tmp/donix/mcpserver.pid";
     std::filesystem::path socketPath = "/tmp/donix/mcpserver.sock";
     
-    int pty_master_fd;
-    pid_t child_pid = forkpty(&pty_master_fd, nullptr, nullptr, nullptr);
-    if (child_pid < 0) {
+    int ptyMasterFd; // master (server process)
+    pid_t childPid = forkpty(&ptyMasterFd, nullptr, nullptr, nullptr); // llama.cpp pty process
+    if (childPid < 0) {
         perror("forkpty failed");
         exit(1);
     }
 
-    int log_fd = open("/tmp/donix/mcpserver.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
-    dup2(log_fd, STDOUT_FILENO);
-    dup2(log_fd, STDERR_FILENO);
-    close(log_fd);
+    int logFd = open("/tmp/donix/mcpserver.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
+    // Temporarly setting stdout as the logfile
+    dup2(logFd, STDOUT_FILENO);
+    dup2(logFd, STDERR_FILENO);
+    close(logFd);
 
     // Register Signal Handlers and clean up function.
     atexit(onExit);
@@ -79,7 +84,8 @@ MCPServer::MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt
     std::signal(SIGTERM, signalHandler);  // kill
     std::signal(SIGHUP, signalHandler);   // terminal closed / hangup
 
-    if (child_pid == 0) {
+    // llama.cpp terminal process
+    if (childPid == 0) {
         const char* program = "./external/llama.cpp/bin/llama-cli";
         std::string gpuStr = std::to_string(this->gpuLayers);
 
@@ -101,15 +107,46 @@ MCPServer::MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt
     
     std::cout << "Writing PID" << std::endl;
 
-    pid_t serverPID = child_pid;
+    // TODO: save the master process instead of this
+    pid_t serverPID = childPid;
     std::ofstream write(pidPath);
     write << serverPID;
     write.close();
 
-    // Save a socket file for the client to acesss and add blocking statements
+    // Server Socket setup
+    //
+    std::filesystem::remove(socketPath);
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(struct sockaddr_un));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
 
+    // Socket Sys Call
+    int socketFD = socket(AF_UNIX, SOCK_STREAM, 0);
+    if(socketFD < 0){
+        perror("socket call failed");
+        exit(1);
+    }
+    int bindRes = bind(socketFD, (struct sockaddr *) &addr, sizeof(sockaddr_un));
+    if(bindRes < 0){
+        perror("bind call failed");
+        exit(1);
+    }
+    
+    int listenRes = listen(socketFD, 2); // 2 connections backlog but needs experimentation
+    if(listenRes < 0){
+        perror("listen call failed");
+        exit(1);
+    }
 
+    while(true){
+        std::cout << "Waiting to recieve connection..." << std::endl;
+        
+        int connectionFD = accept(socketFD, nullptr, nullptr);
+        std::cout << "Socket connection accepted on: " << connectionFD << std::endl;
 
-    sleep(30);
+        // implement client connection and streaming here (buffer async??)
+    }
+
     exit(0);
 }
