@@ -107,8 +107,7 @@ MCPServer::MCPServer(std::string modelPath, int gpuLayers, std::string sysPrompt
     
     std::cout << "Writing PID" << std::endl;
 
-    // TODO: save the master process instead of this
-    pid_t serverPID = childPid;
+    pid_t serverPID = getpid();
     std::ofstream write(pidPath);
     write << serverPID;
     write.close();
